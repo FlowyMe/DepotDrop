@@ -28,7 +28,8 @@ def generate_sentence(input_row, columns=None):
         {"role": "user", "content": prompt},
     ],
     max_tokens=3000)
-    return response.choices[0].text.strip()
+    return response.choices[0].message.content
+    # return response.choices[0].text.strip()
 
 # Function to convert sentence to embedding
 def convert_to_embedding(sentence):
