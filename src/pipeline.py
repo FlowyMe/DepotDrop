@@ -37,7 +37,7 @@ def convert_to_embedding(sentence):
         model="text-embedding-ada-002",
         input=sentence
     ) 
-    return response['data'][0]['embedding']
+    return response.data[0].embedding
 
 # Function to upsert into Pinecone
 def upsert_to_pinecone(index, vector, metadata):
@@ -56,9 +56,10 @@ def main():
         for row in reader:
             row_str = " ".join([str(val) for val in row.values()])
             generated_sentence = generate_sentence(row_str, columns)
-            print (generated_sentence)
-            exit(1)
+            #print (generated_sentence)
             embedding_vector = convert_to_embedding(generated_sentence)
+            print (embedding_vector)
+            exit(1)
             metadata = {key: row[key] for key in row if key != 'text'}
             print (metadata)
             print (generate_sentence)
