@@ -56,14 +56,9 @@ def main():
         for row in reader:
             row_str = " ".join([str(val) for val in row.values()])
             generated_sentence = generate_sentence(row_str, columns)
-            #print (generated_sentence)
             embedding_vector = convert_to_embedding(generated_sentence)
-            print (embedding_vector)
-            exit(1)
-            metadata = {key: row[key] for key in row if key != 'text'}
-            print (metadata)
-            print (generate_sentence)
-            print (metadata)
+            metadata = {key: row[key] for key in row}
+            print(metadata)
             # upsert_to_pinecone(row['index'], embedding_vector, metadata)
 
 if __name__ == "__main__":
