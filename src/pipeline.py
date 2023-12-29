@@ -8,8 +8,6 @@ import os
 import pinecone
 import csv
 from openai import OpenAI
-from openai import AsyncOpenAI
-import requests
 from dotenv import load_dotenv
 import argparse
 
@@ -58,8 +56,8 @@ def main():
             generated_sentence = generate_sentence(row_str, columns)
             embedding_vector = convert_to_embedding(generated_sentence)
             metadata = {key: row[key] for key in row}
-            print(metadata)
-            # upsert_to_pinecone(row['index'], embedding_vector, metadata)
+            #print(metadata)
+            upsert_to_pinecone(row['index'], embedding_vector, metadata)
 
 if __name__ == "__main__":
     main()
