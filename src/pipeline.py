@@ -15,7 +15,7 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 # Initialize APIs
-pinecone.init(api_key=os.getenv('PINECONE_API_KEY'), environment='us-west1-gcp')
+pinecone.init(api_key=os.getenv('PINECONE_API_KEY'), environment='gcp-starter')
 # Function to generate sentence using GPT-4
 def generate_sentence(input_row, columns=None):
     prompt = f"convert this row from a dataset into a 100 word concise but descriptive paragraph with all the  technical specs that I can convert into an embedding. here are the columns for the dataset ensure information from each column is included: {columns} -> {input_row}"
@@ -38,12 +38,14 @@ def convert_to_embedding(sentence):
     return response.data[0].embedding
 
 # Function to upsert into Pinecone
-def upsert_to_pinecone(index, vector, metadata):
-    pinecone_client = pinecone.Index(index)
-    pinecone_client.upsert(items=[(index, vector, metadata)])
+def upsert_to_pinecone(id, vector, metadata):
+    index = pinecone.Index('home-depot')
+    index.upsert ([(id, vector, metadata)])
 
 
 def main():
+    pinecone.describe_index("home-depot")
+    index = pinecone.Index("home-depot")
     parser = argparse.ArgumentParser(description='Process a CSV file.')
     parser.add_argument('csvfile', type=str, help='The CSV file to process')
     args = parser.parse_args()
@@ -56,8 +58,7 @@ def main():
             generated_sentence = generate_sentence(row_str, columns)
             embedding_vector = convert_to_embedding(generated_sentence)
             metadata = {key: row[key] for key in row}
-            #print(metadata)
-            upsert_to_pinecone(row['index'], embedding_vector, metadata)
+            upsert_to_pinecone(row['id'], embedding_vector, metadata)
 
 if __name__ == "__main__":
     main()
