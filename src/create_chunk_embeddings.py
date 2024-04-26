@@ -68,7 +68,13 @@ def process_files_in_directory(directory_path, chunk_size):
             if embd:
                 # Save embeddings and chunks to file
                 with open(embeddings_file, "wb") as f:
-                    pickle.dump([{'chunk': c, 'embedding': e['embedding']} for c, e in zip(chunks, embd)], f)
+                    pickle.dump(
+                        [
+                            {"chunk": c, "embedding": e["embedding"]}
+                            for c, e in zip(chunks, embd)
+                        ],
+                        f,
+                    )
                 print(f"Embeddings and chunks saved to {embeddings_file}")
             else:
                 print(f"Skipping file due to error: {filename}")
@@ -101,11 +107,20 @@ def generate_sentence(prompt, columns=None):
 
 def run_prompt(query, chunks):
     q_embd = get_embeddings_query(query)
-    ratings = [cosine_similarity(q_embd, x['embedding']) for x in vdb]
+    ratings = [cosine_similarity(q_embd, x["embedding"]) for x in vdb]
     k = 4
     idx = np.argpartition(ratings, -k)[-k:]  # Indices not sorted
-    prompt = f"You are a smart agent. A question would be asked to you and relevant information would be provided.\
-    Your task is to answer the question and use the information provided. Question - {query}. Relevant Information - {[vdb[index]['chunk'] for index in idx]}"
+    # prompt = f"You are a smart agent. A question would be asked to you and relevant information would be provided.\
+    # Your task is to answer the question and use the information provided. Question - {query}. Relevant Information - {[vdb[index]['chunk'] for index in idx]}"
+    prompt = f"""Imagine you are an expert handyman and teacher providing essential tips and advice on home improvement 
+                    and repair tasks specifically tailored for amateur homeowners and apartment dwellers. Your responses 
+                    should include not only the necessary steps to complete each task but also estimated costs and timelines. 
+                    Your advice should be clear and easy to follow for someone with minimal DIY experience. 
+                Question: {query}
+                Relevant Information: {[vdb[index]['chunk'] for index in idx]}
+                Provide straightforward, step-by-step guidance that accounts for the user’s limited experience in handling hardware and home repairs."""
+
+    print(prompt)
     result = generate_sentence(prompt)
     print(result["response"])
 
@@ -119,8 +134,8 @@ def main():
     args = parser.parse_args()
 
     chunks = process_files_in_directory(args.dir, args.chunk_size)
-    print("Asking Model: ", args.query)
-    print()
+    # print("Asking Model: ", args.query)
+    # print()
     print("Response: ")
     print()
     run_prompt(args.query, chunks)
